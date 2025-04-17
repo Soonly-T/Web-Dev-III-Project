@@ -29,7 +29,16 @@
   cursor: pointer;
   margin:auto
 }
+.alert{
+  text-align: center;
+}
+.alert.success {
+  color: green;
+}
 
+.alert.failure {
+  color: red;
+}
 
 .App-logo {
   height: 40vmin;
