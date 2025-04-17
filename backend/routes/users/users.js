@@ -72,5 +72,34 @@ router.get('/get-user', async (req, res) => {
         return res.status(500).json({ message: "Failed to fetch user" });
     }
 });
+router.patch('/user/patch-username', jwt.authenticateToken, async (req, res) => {
+    const { newUsername } = req.body;
+    const oldUsername = req.user.USERNAME; // Assuming the JWT middleware adds user info to req.user
+    if (!newUsername) {
+        return res.status(400).json({ message: "New username is required." });
+    }
+    try {
+        await dbOperations.patchUsername(oldUsername, newUsername);
+        return res.status(200).json({ message: "Username updated successfully." });
+    } catch (error) {
+        console.error("Error updating username:", error);
+        return res.status(500).json({ message: "Failed to update username." });
+    }
+});
+
+router.patch('/user/patch-email', jwt.authenticateToken, async (req, res) => {
+    const { newEmail } = req.body;
+    const username = req.user.USERNAME; // Assuming the JWT middleware adds user info to req.user
+    if (!newEmail) {
+        return res.status(400).json({ message: "New email is required." });
+    }
+    try {
+        await dbOperations.patchEmail(newEmail, username);
+        return res.status(200).json({ message: "Email updated successfully." });
+    } catch (error) {
+        console.error("Error updating email:", error);
+        return res.status(500).json({ message: "Failed to update email." });
+    }
+});
 
 module.exports = router;

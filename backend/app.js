@@ -12,7 +12,7 @@ app.use(cors())
 app.use('/', routes);
 
 
-app.listen(port=3000,hostname="192.168.0.115",()=>{
+app.listen(port=3000,hostname="localhost",()=>{
     console.log(`Server is running on http://${hostname}:${[port]}`)
 })
 
