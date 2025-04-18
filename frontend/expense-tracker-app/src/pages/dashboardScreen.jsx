@@ -1,8 +1,9 @@
 import '../App.css';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react'; // Import useMemo
 import { useNavigate } from 'react-router-dom';
-import ExpenseCard from '../components/expenseCard'; // Import the ExpenseCard component
-import './dashboard.css'
+import ExpenseCard from '../components/expenseCard';
+import ExpenseForm from '../components/expenseForm.jsx';
+import './dashboard.css';
 
 function DashboardScreen() {
   const [expenses, setExpenses] = useState([]);
@@ -10,43 +11,51 @@ function DashboardScreen() {
   const [error, setError] = useState('');
   const [selectedMonth, setSelectedMonth] = useState('');
   const [selectedYear, setSelectedYear] = useState('');
-  const [layoutMode, setLayoutMode] = useState('list'); // Default to list view
+  const [layoutMode, setLayoutMode] = useState('list');
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [expenseToModify, setExpenseToModify] = useState(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchExpenses = async () => {
-      setLoading(true);
-      setError('');
-      const token = localStorage.getItem('token');
+  const fetchExpenses = async () => {
+    setLoading(true);
+    setError('');
+    const token = localStorage.getItem('token');
 
-      if (!token) {
+    if (!token) {
+      navigate('/login-signup');
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:3060/expenses/get-expenses', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.status === 401) {
+        localStorage.removeItem('token');
         navigate('/login-signup');
         return;
       }
 
-      try {
-        const response = await fetch('http://localhost:3060/expenses/get-expenses', {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || `Failed to fetch expenses: ${response.status}`);
-        }
-
-        const data = await response.json();
-        console.log("Fetched Expenses:", data.expenses);
-        setExpenses(data.expenses);
-        setLoading(false);
-      } catch (err) {
-        console.error("Error fetching expenses:", err);
-        setError(err.message);
-        setLoading(false);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `Failed to fetch expenses: ${response.status}`);
       }
-    };
 
+      const data = await response.json();
+      console.log("Fetched Expenses:", data.expenses);
+      setExpenses(data.expenses);
+      setLoading(false);
+    } catch (err) {
+      console.error("Error fetching expenses:", err);
+      setError(err.message);
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchExpenses();
   }, [navigate]);
 
@@ -77,20 +86,87 @@ function DashboardScreen() {
         },
       });
 
+      if (response.status === 401) {
+        localStorage.removeItem('token');
+        navigate('/login-signup');
+        return;
+      }
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || `Failed to delete expense: ${response.status}`);
       }
 
       console.log(`Expense with ID ${id} deleted successfully`);
-      // Update the expenses state to remove the deleted expense
       setExpenses(prevExpenses => prevExpenses.filter(expense => expense.ID !== id));
-
       // Optionally, you could refetch expenses here if needed
     } catch (error) {
       console.error('Error deleting expense:', error.message);
-      setError(`Error deleting expense: ${error.message}`); // Update error state
+      setError(`Error deleting expense: ${error.message}`);
     }
+  };
+
+  const handleAddClick = () => {
+    setExpenseToModify(null);
+    setIsFormOpen(true);
+  };
+
+  const handleModifyClick = (expense) => {
+    setExpenseToModify(expense);
+    setIsFormOpen(true);
+  };
+
+  const handleFormSubmit = async (formData) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/login-signup');
+      return;
+    }
+
+    const method = expenseToModify ? 'PUT' : 'POST';
+    const url = expenseToModify
+      ? `http://localhost:3060/expenses/modify-expense`
+      : `http://localhost:3060/expenses/add-expense`;
+
+    const body = expenseToModify
+      ? JSON.stringify({ id: expenseToModify.ID, ...formData })
+      : JSON.stringify(formData);
+
+    try {
+      const response = await fetch(url, {
+        method: method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: body,
+      });
+
+      if (response.status === 401) {
+        localStorage.removeItem('token');
+        navigate('/login-signup');
+        return;
+      }
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `${expenseToModify ? 'Modify' : 'Add'} failed with status: ${response.status}`);
+      }
+
+      console.log(`${expenseToModify ? 'Modify' : 'Add'} successful`);
+      setIsFormOpen(false);
+      setExpenseToModify(null);
+      fetchExpenses(); // Refetch expenses to update the list
+    } catch (error) {
+      console.error(`${expenseToModify ? 'Modify' : 'Add'} error:`, error.message);
+      setError(`${expenseToModify ? 'Modify' : 'Add'} failed: ${error.message}`);
+    }
+  };
+
+  const handleCloseForm = () => {
+    setIsFormOpen(false);
+    setExpenseToModify(null);
+    setError('');
   };
 
   const filteredExpenses = expenses.filter(expense => {
@@ -103,6 +179,11 @@ function DashboardScreen() {
 
     return monthMatch && yearMatch;
   });
+
+  // Calculate the total expenditure of the filtered expenses
+  const totalExpenditure = useMemo(() => {
+    return filteredExpenses.reduce((sum, expense) => sum + parseFloat(expense.AMOUNT), 0);
+  }, [filteredExpenses]); // Recalculate whenever filteredExpenses changes
 
   if (loading) {
     return <div>Loading expenses...</div>;
@@ -144,6 +225,10 @@ function DashboardScreen() {
         </select>
       </div>
 
+      {/* Display Total Expenditure */}
+      <h3>Total Expenditure: ${totalExpenditure.toFixed(2)}</h3> {/* Display the total, formatted to 2 decimal places */}
+
+
       {/* Layout Selection */}
       <div>
         <label>Layout:</label>
@@ -165,16 +250,36 @@ function DashboardScreen() {
         Grid
       </div>
 
+      {/* Add Expense Button */}
+      <button onClick={handleAddClick}>Add Expense</button>
+
+
       <h2>Expenses</h2>
       {filteredExpenses.length > 0 ? (
         <div className={`expense-list-container ${layoutMode === 'grid' ? 'grid-view' : 'list-view'}`}>
           {filteredExpenses.map(expense => (
-            <ExpenseCard key={expense.ID} expense={expense} onDelete={handleDeleteExpense} /> 
+            <ExpenseCard key={expense.ID} expense={expense} onDelete={handleDeleteExpense} onModify={handleModifyClick} />
           ))}
         </div>
       ) : (
         <p>No expenses found for the selected month and year.</p>
       )}
+
+      {/* Floating Expense Form (Modal) */}
+      {isFormOpen && (
+        <div className="modal-backdrop">
+          <div className="modal-content">
+            <h3>{expenseToModify ? 'Modify Expense' : 'Add Expense'}</h3>
+            <ExpenseForm
+              initialExpenseData={expenseToModify}
+              onSubmit={handleFormSubmit}
+              buttonText={expenseToModify ? 'Save Changes' : 'Add Expense'}
+            />
+            <button onClick={handleCloseForm}>Cancel</button>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

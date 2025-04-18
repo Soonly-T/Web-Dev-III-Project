@@ -2,8 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import './expenseCard.css'
 
-function ExpenseCard({ expense, onDelete }) { // Receive onDelete function as prop
-  const navigate = useNavigate();
+function ExpenseCard({ expense, onDelete, onModify }) { // Receive onModify function as prop
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -13,18 +12,14 @@ function ExpenseCard({ expense, onDelete }) { // Receive onDelete function as pr
     return `${day}/${month}/${year}`;
   };
 
-  const handleModifyClick = () => {
-    navigate(`/add-expense?id=${expense.ID}`); // Navigate to add-expense page with expense ID
-  };
-
   return (
     <div className="expense-card">
       <p>Amount: {expense.AMOUNT}</p>
       <p>Category: {expense.CATEGORY}</p>
       <p>Date: {formatDate(expense.DATE)}</p>
       <p>Notes: {expense.NOTES}</p>
-      <button onClick={handleModifyClick}>Modify</button>
-      <button onClick={() => onDelete(expense.ID)}>Delete</button> {/* Call onDelete with expense ID */}
+      <button onClick={() => onModify(expense)}>Modify</button> {/* Call onModify with the expense object */}
+      <button onClick={() => onDelete(expense.ID)}>Delete</button>
     </div>
   );
 }
