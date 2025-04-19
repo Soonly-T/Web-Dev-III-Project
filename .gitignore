@@ -129,5 +129,5 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-/backend/node_modules/
-/database/node_modules/
+./backend/node_modules/
+./database/node_modules/
