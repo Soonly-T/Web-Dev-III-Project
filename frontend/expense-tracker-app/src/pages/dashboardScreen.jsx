@@ -165,7 +165,7 @@ function DashboardScreen() {
 
     const method = expenseToModify ? 'PUT' : 'POST';
     const url = expenseToModify
-      ? `http://localhost:3060/expenses/modify-expense/${expenseToModify.ID}`
+      ? `http://localhost:3060/expenses/modify-expense`
       : `http://localhost:3060/expenses/add-expense`;
 
     const body = expenseToModify

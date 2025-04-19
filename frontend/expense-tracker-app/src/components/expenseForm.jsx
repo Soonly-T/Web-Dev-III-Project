@@ -42,16 +42,29 @@ function ExpenseForm({ initialExpenseData, onSubmit, buttonText = 'Submit' }) {
       // Format the date to 'YYYY-MM-DD' for the input type="date"
       if (initialExpenseData.DATE) {
         const expenseDate = new Date(initialExpenseData.DATE);
-        const year = expenseDate.getFullYear();
-        const month = String(expenseDate.getMonth() + 1).padStart(2, '0');
-        const day = String(expenseDate.getDate()).padStart(2, '0');
-        setDate(`${year}-${month}-${day}`);
+        // Check if date is valid before formatting
+        if (!isNaN(expenseDate.getTime())) {
+            const year = expenseDate.getFullYear();
+            const month = String(expenseDate.getMonth() + 1).padStart(2, '0');
+            const day = String(expenseDate.getDate()).padStart(2, '0');
+            setDate(`${year}-${month}-${day}`);
+        } else {
+             setDate(''); // Set to empty string if initial date is invalid
+        }
       } else {
         setDate('');
       }
       setNotes(initialExpenseData.NOTES || '');
+    } else {
+        // Reset form fields when initialExpenseData is null (for add operation)
+        setAmount('');
+        setCategory('');
+        setDate('');
+        setNotes('');
+        setShowCustomCategoryInput(false);
+        setCustomCategory('');
     }
-  }, [initialExpenseData]); // Re-run effect if initialExpenseData changes
+  }, [initialExpenseData]); // Re-run effect if initialExpenseData changes (between add and modify)
 
   const handleCategoryChange = (e) => {
     const selectedValue = e.target.value;
@@ -79,9 +92,23 @@ function ExpenseForm({ initialExpenseData, onSubmit, buttonText = 'Submit' }) {
         return; // Prevent submission
     }
 
+    // --- Create the data object to send, including the ID if modifying ---
+    const formData = {
+      amount: amount,
+      category: categoryToSend,
+      date: date,
+      notes: notes,
+    };
 
-    // Pass the form data up to the parent component
-    onSubmit({ amount, category: categoryToSend, date, notes });
+    // If we are in modify mode (initialExpenseData exists), add the ID to the data
+    if (initialExpenseData && initialExpenseData.ID) {
+        formData.id = initialExpenseData.ID;
+    }
+    // --------------------------------------------------------------------
+
+
+    // Pass the form data (now potentially including ID) up to the parent component
+    onSubmit(formData);
   };
 
   return (
@@ -96,6 +123,8 @@ function ExpenseForm({ initialExpenseData, onSubmit, buttonText = 'Submit' }) {
             onChange={(e) => setAmount(e.target.value)}
             placeholder='USD'
             required
+            min="0.01" // Added basic validation
+            step="0.01" // Added step for decimal input
           />
         </div>
         <div className='input'>
