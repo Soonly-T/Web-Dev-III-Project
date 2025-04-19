@@ -360,7 +360,7 @@ function DashboardScreen() {
 
             {/* Layout Selection */}
             <div className="layout">
-              <div className='radio'>
+              {/* <div className='radio'>
 
                 <label>Layout:</label>
                 <label>
@@ -384,7 +384,7 @@ function DashboardScreen() {
                   Grid
                 </label>
 
-              </div>
+              </div> */}
               <div>
                 <button id='add' onClick={handleAddClick}>+ New</button>
               </div>
@@ -413,7 +413,7 @@ function DashboardScreen() {
         <h1>All Expenses</h1>
 
         <div className="layout">
-          <div className='radio'>
+          {/* <div className='radio'>
             <label>Layout:</label>
             <label>
               <input
@@ -436,7 +436,7 @@ function DashboardScreen() {
               Grid
             </label>
 
-          </div>
+          </div> */}
           <div>
             <button id='add' onClick={handleAddClick}>+ New</button>
           </div>
