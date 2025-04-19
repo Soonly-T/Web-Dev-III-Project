@@ -14,14 +14,15 @@ function ExpenseCard({ expense, onDelete, onModify }) { // Receive onModify func
 
   return (
     <div className="expense-card">
-      <p>Amount: {expense.AMOUNT}</p>
+      <p>Amount: ${expense.AMOUNT}</p>
       <p>Category: {expense.CATEGORY}</p>
       <p>Date: {formatDate(expense.DATE)}</p>
       <p>Notes: {expense.NOTES}</p>
       <button onClick={() => onModify(expense)}>Modify</button> {/* Call onModify with the expense object */}
-      <button onClick={() => onDelete(expense.ID)}>Delete</button>
+      <button id='del' onClick={() => onDelete(expense.ID)}>Delete</button>
     </div>
   );
 }
+
 
 export default ExpenseCard;

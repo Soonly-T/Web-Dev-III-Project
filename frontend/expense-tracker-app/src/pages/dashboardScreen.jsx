@@ -1,9 +1,9 @@
 import '../App.css';
 import React, { useState, useEffect, useMemo } from 'react'; // Import useMemo
 import { useNavigate } from 'react-router-dom';
-import ExpenseCard from '../components/expenseCard';
+import ExpenseCard from '../components/expenseCard.jsx';
 import ExpenseForm from '../components/expenseForm.jsx';
-import CategoryPieChart from '../components/categoryPieChart'; // Import the Pie Chart component
+import CategoryPieChart from '../components/categoryPieChart.jsx'; // Import the Pie Chart component
 import './dashboard.css';
 
 function DashboardScreen() {
@@ -13,7 +13,7 @@ function DashboardScreen() {
   const [selectedMonth, setSelectedMonth] = useState('');
   const [selectedYear, setSelectedYear] = useState('');
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState(''); // State for category filter
-  const [layoutMode, setLayoutMode] = useState('list');
+  const [layoutMode, setLayoutMode] = useState('grid');
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [expenseToModify, setExpenseToModify] = useState(null);
   const navigate = useNavigate();
@@ -60,6 +60,12 @@ function DashboardScreen() {
     }
   };
 
+  const [activeElement, setActiveElement] = useState('home'); // State to track which element is visible
+
+  const handlePage = (elementId) => {
+    setActiveElement(elementId);
+  };
+  
   // Fetch expenses when the component mounts
   useEffect(() => {
     fetchExpenses();
@@ -227,107 +233,186 @@ function DashboardScreen() {
   }
 
   return (
-    <div>
-      <h1>Expense Dashboard</h1>
-
-      {/* Filter Controls */}
-      <div>
-        <label htmlFor="month">Month:</label>
-        <select id="month" value={selectedMonth} onChange={handleMonthChange}>
-          <option value="">All Months</option>
-          <option value="1">January</option>
-          <option value="2">February</option>
-          <option value="3">March</option>
-          <option value="4">April</option>
-          <option value="5">May</option>
-          <option value="6">June</option>
-          <option value="7">July</option>
-          <option value="8">August</option>
-          <option value="9">September</option>
-          <option value="10">October</option>
-          <option value="11">November</option>
-          <option value="12">December</option>
-        </select>
-
-        <label htmlFor="year">Year:</label>
-        <select id="year" value={selectedYear} onChange={handleYearChange}>
-          <option value="">All Years</option>
-          {/* You might want to generate years dynamically based on your data */}
-          <option value="2023">2023</option>
-          <option value="2024">2024</option>
-          <option value="2025">2025</option>
-        </select>
-
-        {/* Category Filter */}
-        <label htmlFor="category-filter">Category:</label>
-        <select id="category-filter" value={selectedCategoryFilter} onChange={handleCategoryFilterChange}>
-          {uniqueCategories.map(category => (
-            <option key={category} value={category === 'All Categories' ? '' : category}>
-              {category}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {/* Display Total Expenditure */}
-      <h3>Total Expenditure: ${totalExpenditure.toFixed(2)}</h3>
-
-      {/* Pie Chart */}
-      <div style={{ width: '100%', height: '300px' }}> {/* Container for the chart */}
-        <CategoryPieChart data={filteredExpenses} /> {/* Pass filtered expenses to the chart */}
-      </div>
-
-
-      {/* Layout Selection */}
-      <div>
-        <label>Layout:</label>
-        <input
-          type="radio"
-          name="layout"
-          value="list"
-          checked={layoutMode === 'list'}
-          onChange={handleLayoutChange}
-        />
-        List
-        <input
-          type="radio"
-          name="layout"
-          value="grid"
-          checked={layoutMode === 'grid'}
-          onChange={handleLayoutChange}
-        />
-        Grid
-      </div>
-
-      {/* Add Expense Button */}
-      <button onClick={handleAddClick}>Add Expense</button>
-
-
-      <h2>Expenses</h2>
-      {filteredExpenses.length > 0 ? (
-        <div className={`expense-list-container ${layoutMode === 'grid' ? 'grid-view' : 'list-view'}`}>
-          {filteredExpenses.map(expense => (
-            <ExpenseCard key={expense.ID} expense={expense} onDelete={handleDeleteExpense} onModify={handleModifyClick} />
-          ))}
-        </div>
-      ) : (
-        <p>No expenses found for the selected month, year, or category.</p>
-      )}
-
+    <div className='grid-container'>
       {/* Floating Expense Form (Modal) */}
       {isFormOpen && (
-        <div className="modal-backdrop">
-          <div className="modal-content">
-            <h3>{expenseToModify ? 'Modify Expense' : 'Add Expense'}</h3>
-            <ExpenseForm
-              initialExpenseData={expenseToModify}
-              onSubmit={handleFormSubmit}
-              buttonText={expenseToModify ? 'Save Changes' : 'Add Expense'}
-            />
-            <button onClick={handleCloseForm}>Cancel</button>
+          <div className="modal-backdrop">
+            <div className="modal-content">
+              <div className="cont">
+                <h3>{expenseToModify ? 'Modify Expense' : 'Add Expense'}</h3>
+                <ExpenseForm
+                  initialExpenseData={expenseToModify}
+                  onSubmit={handleFormSubmit}
+                  buttonText={expenseToModify ? 'Save Changes' : 'Add Expense'}
+                />
+                <button id='cancel' onClick={handleCloseForm}>Cancel</button>
+              </div>
+            </div>
+          </div>
+        )}
+      <div className='title'>
+        <h1>Expense Dashboard</h1>
+        <hr></hr>
+      </div>
+      <div className='menu'>
+        <button onClick={() =>handlePage('home')}>Home</button>
+        <button onClick={() =>handlePage('expense')}>All Expenses</button>
+        
+        {/* Add Expense Button */}
+        <button onClick={handleAddClick}>Add Expense</button>
+
+      </div>
+      <div className='main'>
+        <div id='home' style={{display: activeElement === 'home' ? 'block' : 'none',}}>
+        <div className='content'>
+          {/* Filter Controls */}
+          
+          <div className='expense'>
+            {/* Display Total Expenditure */}
+            <h3>Total Expenditure: <span style={{ color: totalExpenditure > 0 ? 'red' : 'rgb(0, 221, 44)' }}>
+              ${totalExpenditure.toFixed(2)}</span>
+            </h3>
+            <div className='filter'>
+            <label htmlFor="month">Month:
+              <select id="month" value={selectedMonth} onChange={handleMonthChange}>
+                <option value="">All Months</option>
+                <option value="1">January</option>
+                <option value="2">February</option>
+                <option value="3">March</option>
+                <option value="4">April</option>
+                <option value="5">May</option>
+                <option value="6">June</option>
+                <option value="7">July</option>
+                <option value="8">August</option>
+                <option value="9">September</option>
+                <option value="10">October</option>
+                <option value="11">November</option>
+                <option value="12">December</option>
+              </select>
+            </label>
+            <label htmlFor="year">Year:
+              <select id="year" value={selectedYear} onChange={handleYearChange}>
+                <option value="">All Years</option>
+                {/* You might want to generate years dynamically based on your data */}
+                <option value="2023">2023</option>
+                <option value="2024">2024</option>
+                <option value="2025">2025</option>
+              </select>
+            </label>
+            {/* Category Filter */}
+            <label htmlFor="category-filter">Category:
+              <select id="category-filter" value={selectedCategoryFilter} onChange={handleCategoryFilterChange}>
+                {uniqueCategories.map(category => (
+                  <option key={category} value={category === 'All Categories' ? '' : category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+            {/* Pie Chart */}
+            <div style={{ width: '100%', height: '300px' }}> {/* Container for the chart */}
+              <CategoryPieChart data={filteredExpenses} /> {/* Pass filtered expenses to the chart */}
+            </div>
+          </div>
+
+        
+        </div>
+          {/*Recent Expense*/}
+          <div className='footer'>
+            <h2>Recent Expenses</h2>
+            
+            {/* Layout Selection */}
+            <div className="layout">
+              <div className='radio'>
+
+                <label>Layout:</label>
+                <label>
+                  <input
+                    type="radio"
+                    name="layout"
+                    value="list"
+                    checked={layoutMode === 'list'}
+                    onChange={handleLayoutChange}
+                  />
+                  List
+                </label>
+                <label>
+                  <input
+                    type="radio"
+                    name="layout"
+                    value="grid"
+                    checked={layoutMode === 'grid'}
+                    onChange={handleLayoutChange}
+                  />
+                  Grid
+                </label>
+      
+              </div>
+              <div>
+                <button id='add' onClick={handleAddClick}>+ New</button>
+
+              </div>
+
+            </div>
+            {filteredExpenses.length > 0 ? (
+              <div className={`expense-list-container ${layoutMode === 'list' ? 'list-view' : 'grid-view'}`}>
+                {filteredExpenses
+                  .sort((a, b) => new Date(b.DATE) - new Date(a.DATE)) // Sort by date in descending order (newest first)
+                  .slice(0, 3) // Take the first 3 elements (newest) after sorting
+                  .map(expense => (
+                    <ExpenseCard key={expense.ID} expense={expense} onDelete={handleDeleteExpense} onModify={handleModifyClick} />
+                  ))}
+              </div>
+            ) : (
+              <p>No expenses found for the selected month, year, or category.</p>
+            )}
+            
           </div>
         </div>
-      )}
+      <div className='exp' style={{display: activeElement === 'expense' ? 'block' : 'none', padding:'10vh'}}>
+        <h1>All Expenses</h1>
+
+        <div className="layout">
+          <div className='radio'>
+            <label>Layout:</label>
+            <label>
+              <input
+                type="radio"
+                name="layout"
+                value="list"
+                checked={layoutMode === 'list'}
+                onChange={handleLayoutChange}
+              />
+              List
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="layout"
+                value="grid"
+                checked={layoutMode === 'grid'}
+                onChange={handleLayoutChange}
+              />
+              Grid
+            </label>
+  
+          </div>
+          <div>
+            <button id='add' onClick={handleAddClick}>+ New</button>
+          </div>
+        </div>
+        {filteredExpenses.length > 0 ? (
+              <div className={`expense-list-container ${layoutMode === 'list' ? 'list-view' : 'grid-view'}`}>
+                {filteredExpenses.map(expense => (
+                  <ExpenseCard key={expense.ID} expense={expense} onDelete={handleDeleteExpense} onModify={handleModifyClick} />
+                ))}
+              </div>
+            ) : (
+              <p>No expenses found for the selected month, year, or category.</p>
+            )}
+      </div>
+      </div>
 
     </div>
   );
