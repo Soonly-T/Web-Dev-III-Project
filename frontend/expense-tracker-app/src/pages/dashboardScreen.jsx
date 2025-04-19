@@ -394,7 +394,7 @@ function DashboardScreen() {
                 {activeElement === 'home'
                   ? filteredExpenses
                       .sort((a, b) => new Date(b.DATE) - new Date(a.DATE))
-                      .slice(0, 3)
+                      .slice(0, 10)
                       .map(expense => (
                         <ExpenseCard key={expense.ID} expense={expense} onDelete={handleDeleteExpense} onModify={handleModifyClick} />
                       ))
