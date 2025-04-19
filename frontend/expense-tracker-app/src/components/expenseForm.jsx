@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import './expenseForm.css'
 
 // Define the list of common categories
 const COMMON_CATEGORIES = [
@@ -85,56 +86,59 @@ function ExpenseForm({ initialExpenseData, onSubmit, buttonText = 'Submit' }) {
 
   return (
     <form onSubmit={handleSubmit}>
-      <div>
-        <label htmlFor="amount">Amount:</label>
-        <input
-          type="number"
-          id="amount"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          required
-        />
-      </div>
-      <div>
-        <label htmlFor="category">Category:</label>
-        <select id="category" value={category} onChange={handleCategoryChange} required>
-          <option value="">Select a Category</option> {/* Optional: Add a default empty option */}
-          {COMMON_CATEGORIES.map((cat) => (
-            <option key={cat} value={cat}>
-              {cat}
-            </option>
-          ))}
-        </select>
-      </div>
-      {showCustomCategoryInput && ( // Conditionally render the custom input field
-        <div>
-          <label htmlFor="customCategory">Custom Category:</label>
+      <div className='cont'>
+        <div className='input'>
+          <label htmlFor="amount">Amount:</label>
           <input
-            type="text"
-            id="customCategory"
-            value={customCategory}
-            onChange={(e) => setCustomCategory(e.target.value)}
-            required={showCustomCategoryInput} // Make required only if visible
+            type="number"
+            id="amount"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            placeholder='USD'
+            required
           />
         </div>
-      )}
-      <div>
-        <label htmlFor="date">Date:</label>
-        <input
-          type="date"
-          id="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          required
-        />
-      </div>
-      <div>
-        <label htmlFor="notes">Notes:</label>
-        <textarea
-          id="notes"
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-        />
+        <div className='input'>
+          <label htmlFor="category">Category:</label>
+          <select id="category" value={category} onChange={handleCategoryChange} required>
+            <option value="">Select a Category</option> {/* Optional: Add a default empty option */}
+            {COMMON_CATEGORIES.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </select>
+        </div>
+        {showCustomCategoryInput && ( // Conditionally render the custom input field
+          <div className='input'>
+            <label htmlFor="customCategory">Custom Category:</label>
+            <input
+              type="text"
+              id="customCategory"
+              value={customCategory}
+              onChange={(e) => setCustomCategory(e.target.value)}
+              required={showCustomCategoryInput} // Make required only if visible
+            />
+          </div>
+        )}
+        <div className='input'>
+          <label htmlFor="date">Date:</label>
+          <input
+            type="date"
+            id="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            required
+          />
+        </div>
+        <div className='input'>
+          <label htmlFor="notes">Notes:</label>
+          <textarea
+            id="notes"
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+          />
+        </div>
       </div>
       <button type="submit">{buttonText}</button>
     </form>

@@ -1,13 +1,27 @@
 .expense-card {
   width: 300px;
-  height: 300px;
-  border: 1px solid #ccc;
+  height: fit-content;
+  border-radius: 5px;
   margin-bottom: 0; /* Remove bottom margin as it's handled by the container now */
   padding: 15px;
   box-sizing: border-box;
+  background-color: rgba(255, 255, 255);
+  color: rgb(0, 36, 63);
+  
 }
 
 /* You can add more specific styling for the content within the card if needed */
 .expense-card p {
   margin: 5px 0;
+}
+
+#del{
+  background: none;
+  color: rgb(255, 0, 0);
+  border: solid red 1px;
+}
+
+#del:hover{
+  background-color: rgb(255, 207, 207);
+  transition: 0.3s;
 }

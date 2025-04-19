@@ -23,27 +23,55 @@ function CategoryPieChart({ data }) {
   ];
 
   return (
-    <div style={{ width: '100%', height: 300 }}> {/* Container for the chart */}
-      <ResponsiveContainer>
-        <PieChart>
-          <Pie
-            data={chartData}
-            cx="50%" // Center X position
-            cy="50%" // Center Y position
-            outerRadius={80} // Radius of the pie chart
-            fill="#8884d8"
-            dataKey="value"
-            labelLine={false}
-            // label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`} // Optional label on slices
-          >
-            {chartData.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-            ))}
-          </Pie>
-          <Tooltip formatter={(value) => `$${value.toFixed(2)}`} /> {/* Tooltip on hover */}
-          <Legend /> {/* Displays the legend with category names and colors */}
-        </PieChart>
-      </ResponsiveContainer>
+    <div style={{ width: '100%', height: 300, display: 'flex', flexDirection: 'row' }}>
+      <div style={{ flex: 1 }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart style={{ position: 'relative', left: '-50px' }}> {/* Make PieChart a positioning context */}
+            <Pie
+              data={chartData}
+              cx="50%"
+              cy="50%"
+              innerRadius={50}
+              outerRadius={80}
+              fill="#8884d8"
+              dataKey="value"
+              labelLine={false}
+            >
+              {chartData.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+              ))}
+            </Pie>
+            <Tooltip 
+              formatter={(value) => `$${value.toFixed(2)}`} 
+              contentStyle={{
+                backgroundColor: 'rgba(227, 227, 227, 0.9)',
+                border: '1px solid #ccc',
+                borderRadius: '5px',
+                padding: '10px',
+              }}
+              itemStyle={{
+                color: 'rgba(2, 0, 43, 0.7)',
+                fontWeight: 'bold',
+              }}
+            />
+            <Legend
+              layout="vertical"
+              align="middle"
+              wrapperStyle={{
+                lineHeight: '24px',
+                position: 'absolute',
+                right: 0,
+                top: '50%',
+                transform: 'translateY(-50%)',
+              }}
+              
+              
+            />
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
+      {/* You might want to adjust the flex of the outer div or add padding */}
+      {/* to accommodate the legend's width */}
     </div>
   );
 }
