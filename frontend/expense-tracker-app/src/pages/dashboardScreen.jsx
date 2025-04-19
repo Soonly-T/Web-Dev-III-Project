@@ -1,10 +1,10 @@
 import '../App.css';
-import React, { useState, useEffect, useMemo } from 'react'; // Import useMemo
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ExpenseCard from '../components/expenseCard.jsx';
-import ExpenseForm from '../components/expenseForm.jsx';
-import CategoryPieChart from '../components/categoryPieChart.jsx'; // Import the Pie Chart component
-import './dashboard.css';
+import ExpenseCard from '../components/expenseCard.jsx'; // Ensure correct path
+import ExpenseForm from '../components/expenseForm.jsx'; // Ensure correct path
+import CategoryPieChart from '../components/categoryPieChart.jsx'; // Ensure correct path
+import './dashboard.css'; // Assuming dashboard.css exists for specific dashboard styles
 
 function DashboardScreen() {
   const [expenses, setExpenses] = useState([]);
@@ -12,7 +12,7 @@ function DashboardScreen() {
   const [error, setError] = useState('');
   const [selectedMonth, setSelectedMonth] = useState('');
   const [selectedYear, setSelectedYear] = useState('');
-  const [selectedCategoryFilter, setSelectedCategoryFilter] = useState(''); // State for category filter
+  const [selectedCategoryFilter, setSelectedCategoryFilter] = useState('');
   const [layoutMode, setLayoutMode] = useState('grid');
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [expenseToModify, setExpenseToModify] = useState(null);
@@ -25,6 +25,7 @@ function DashboardScreen() {
     const token = localStorage.getItem('token');
 
     if (!token) {
+      // If no token, redirect to login immediately
       navigate('/login-signup');
       return;
     }
@@ -38,8 +39,8 @@ function DashboardScreen() {
 
       // Handle expired token
       if (response.status === 401) {
-        localStorage.removeItem('token');
-        navigate('/login-signup');
+        localStorage.removeItem('token'); // Remove invalid token
+        navigate('/login-signup'); // Redirect to login
         return;
       }
 
@@ -50,7 +51,6 @@ function DashboardScreen() {
 
       const data = await response.json();
       console.log("Fetched Expenses:", data.expenses);
-      // Assuming expense dates are in a format compatible with new Date()
       setExpenses(data.expenses);
       setLoading(false);
     } catch (err) {
@@ -65,11 +65,30 @@ function DashboardScreen() {
   const handlePage = (elementId) => {
     setActiveElement(elementId);
   };
-  
+
   // Fetch expenses when the component mounts
   useEffect(() => {
     fetchExpenses();
   }, [navigate]); // Dependency on navigate to avoid lint warning if navigate changes
+
+  // --- useMemo hook to get unique years from expenses ---
+  const availableYears = useMemo(() => {
+    const years = expenses
+      .map(expense => {
+        const date = new Date(expense.DATE);
+        return isNaN(date.getTime()) ? null : date.getFullYear();
+      })
+      .filter(year => year !== null);
+
+    const uniqueYears = [...new Set(years)].sort((a, b) => a - b);
+
+    if (uniqueYears.length === 0) {
+      return [new Date().getFullYear()];
+    }
+
+    return uniqueYears;
+  }, [expenses]);
+  // ---------------------------------------------------------
 
   // Handlers for filter changes
   const handleMonthChange = (event) => {
@@ -118,9 +137,7 @@ function DashboardScreen() {
       }
 
       console.log(`Expense with ID ${id} deleted successfully`);
-      // Update the expenses state to remove the deleted expense
       setExpenses(prevExpenses => prevExpenses.filter(expense => expense.ID !== id));
-      // Optionally, you could refetch expenses here if needed
     } catch (error) {
       console.error('Error deleting expense:', error.message);
       setError(`Error deleting expense: ${error.message}`);
@@ -129,12 +146,12 @@ function DashboardScreen() {
 
   // Handlers for opening the form modal
   const handleAddClick = () => {
-    setExpenseToModify(null); // Null indicates adding a new expense
+    setExpenseToModify(null);
     setIsFormOpen(true);
   };
 
   const handleModifyClick = (expense) => {
-    setExpenseToModify(expense); // Set the expense data for modification
+    setExpenseToModify(expense);
     setIsFormOpen(true);
   };
 
@@ -148,12 +165,12 @@ function DashboardScreen() {
 
     const method = expenseToModify ? 'PUT' : 'POST';
     const url = expenseToModify
-      ? `http://localhost:3060/expenses/modify-expense` // Your modify endpoint
-      : `http://localhost:3060/expenses/add-expense`; // Your add endpoint
+      ? `http://localhost:3060/expenses/modify-expense/${expenseToModify.ID}`
+      : `http://localhost:3060/expenses/add-expense`;
 
     const body = expenseToModify
-      ? JSON.stringify({ id: expenseToModify.ID, ...formData }) // Include ID for modify
-      : JSON.stringify(formData); // Just form data for add
+      ? JSON.stringify({ ...formData })
+      : JSON.stringify(formData);
 
     try {
       const response = await fetch(url, {
@@ -178,8 +195,8 @@ function DashboardScreen() {
       }
 
       console.log(`${expenseToModify ? 'Modify' : 'Add'} successful`);
-      setIsFormOpen(false); // Close the form
-      setExpenseToModify(null); // Clear expense data
+      setIsFormOpen(false);
+      setExpenseToModify(null);
       fetchExpenses(); // Refetch expenses to update the list and chart
     } catch (error) {
       console.error(`${expenseToModify ? 'Modify' : 'Add'} error:`, error.message);
@@ -190,47 +207,58 @@ function DashboardScreen() {
   // Handler for closing the form modal
   const handleCloseForm = () => {
     setIsFormOpen(false);
-    setExpenseToModify(null); // Clear expense data when closing
-    setError(''); // Clear any form-related error message
+    setExpenseToModify(null);
+    setError('');
   };
 
   // Filter expenses based on selected month, year, and category
   const filteredExpenses = useMemo(() => {
     return expenses.filter(expense => {
       const expenseDate = new Date(expense.DATE);
+      if (isNaN(expenseDate.getTime())) {
+          console.warn("Invalid expense date found:", expense.DATE);
+          return false;
+      }
+
       const expenseMonth = expenseDate.getMonth() + 1;
       const expenseYear = expenseDate.getFullYear();
 
       const monthMatch = !selectedMonth || parseInt(selectedMonth) === expenseMonth;
       const yearMatch = !selectedYear || parseInt(selectedYear) === expenseYear;
-      // Category filter: match if no filter is selected OR the expense category matches the selected filter
       const categoryMatch = !selectedCategoryFilter || expense.CATEGORY === selectedCategoryFilter;
-
 
       return monthMatch && yearMatch && categoryMatch;
     });
-  }, [expenses, selectedMonth, selectedYear, selectedCategoryFilter]); // Recalculate when expenses or filter criteria change
-
+  }, [expenses, selectedMonth, selectedYear, selectedCategoryFilter]);
 
   // Calculate the total expenditure of the filtered expenses
   const totalExpenditure = useMemo(() => {
     return filteredExpenses.reduce((sum, expense) => sum + parseFloat(expense.AMOUNT), 0);
-  }, [filteredExpenses]); // Recalculate whenever filteredExpenses changes
+  }, [filteredExpenses]);
 
   // Get unique categories for the filter dropdown from all expenses
   const uniqueCategories = useMemo(() => {
-    const categories = expenses.map(expense => expense.CATEGORY || 'Uncategorized');
-    return ['All Categories', ...new Set(categories)].sort(); // Add "All Categories" and sort alphabetically
-  }, [expenses]); // Recalculate when the main expenses list changes
+    const categories = expenses.map(expense => String(expense.CATEGORY || 'Uncategorized'));
+    const unique = new Set(categories);
+    return ['All Categories', ...Array.from(unique)].sort();
+  }, [expenses]);
+
+  // --- Handler for Logout ---
+  const handleLogout = () => {
+    localStorage.removeItem('token'); // Remove the token from local storage
+    navigate('/login-signup'); // Redirect the user to the login/signup page
+  };
+  // --------------------------
 
 
   if (loading) {
     return <div>Loading expenses...</div>;
   }
 
-  if (error) {
-    return <div>Error: {error}</div>;
+  if (error && expenses.length === 0) {
+      return <div>Error: {error}</div>;
   }
+
 
   return (
     <div className='grid-container'>
@@ -250,6 +278,10 @@ function DashboardScreen() {
             </div>
           </div>
         )}
+       {error && expenses.length > 0 && (
+           <div className="alert failure">{error}</div>
+       )}
+
       <div className='title'>
         <h1>Expense Dashboard</h1>
         <hr></hr>
@@ -257,16 +289,19 @@ function DashboardScreen() {
       <div className='menu'>
         <button onClick={() =>handlePage('home')}>Home</button>
         <button onClick={() =>handlePage('expense')}>All Expenses</button>
-        
+
         {/* Add Expense Button */}
         <button onClick={handleAddClick}>Add Expense</button>
+
+        {/* Logout Button */}
+        <button onClick={handleLogout} className="logout-button">Logout</button>
 
       </div>
       <div className='main'>
         <div id='home' style={{display: activeElement === 'home' ? 'block' : 'none',}}>
         <div className='content'>
           {/* Filter Controls */}
-          
+
           <div className='expense'>
             {/* Display Total Expenditure */}
             <h3>Total Expenditure: <span style={{ color: totalExpenditure > 0 ? 'red' : 'rgb(0, 221, 44)' }}>
@@ -293,10 +328,11 @@ function DashboardScreen() {
             <label htmlFor="year">Year:
               <select id="year" value={selectedYear} onChange={handleYearChange}>
                 <option value="">All Years</option>
-                {/* You might want to generate years dynamically based on your data */}
-                <option value="2023">2023</option>
-                <option value="2024">2024</option>
-                <option value="2025">2025</option>
+                {availableYears.map(year => (
+                  <option key={year} value={year}>
+                    {year}
+                  </option>
+                ))}
               </select>
             </label>
             {/* Category Filter */}
@@ -311,17 +347,17 @@ function DashboardScreen() {
             </label>
           </div>
             {/* Pie Chart */}
-            <div style={{ width: '100%', height: '300px' }}> {/* Container for the chart */}
-              <CategoryPieChart data={filteredExpenses} /> {/* Pass filtered expenses to the chart */}
+            <div style={{ width: '100%', height: '300px' }}>
+              <CategoryPieChart data={filteredExpenses} key={filteredExpenses.length} />
             </div>
           </div>
 
-        
+
         </div>
           {/*Recent Expense*/}
           <div className='footer'>
             <h2>Recent Expenses</h2>
-            
+
             {/* Layout Selection */}
             <div className="layout">
               <div className='radio'>
@@ -347,27 +383,30 @@ function DashboardScreen() {
                   />
                   Grid
                 </label>
-      
+
               </div>
               <div>
                 <button id='add' onClick={handleAddClick}>+ New</button>
-
               </div>
-
             </div>
             {filteredExpenses.length > 0 ? (
               <div className={`expense-list-container ${layoutMode === 'list' ? 'list-view' : 'grid-view'}`}>
-                {filteredExpenses
-                  .sort((a, b) => new Date(b.DATE) - new Date(a.DATE)) // Sort by date in descending order (newest first)
-                  .slice(0, 3) // Take the first 3 elements (newest) after sorting
-                  .map(expense => (
-                    <ExpenseCard key={expense.ID} expense={expense} onDelete={handleDeleteExpense} onModify={handleModifyClick} />
-                  ))}
+                {activeElement === 'home'
+                  ? filteredExpenses
+                      .sort((a, b) => new Date(b.DATE) - new Date(a.DATE))
+                      .slice(0, 3)
+                      .map(expense => (
+                        <ExpenseCard key={expense.ID} expense={expense} onDelete={handleDeleteExpense} onModify={handleModifyClick} />
+                      ))
+                  : filteredExpenses.map(expense => (
+                      <ExpenseCard key={expense.ID} expense={expense} onDelete={handleDeleteExpense} onModify={handleModifyClick} />
+                    ))
+                }
               </div>
             ) : (
               <p>No expenses found for the selected month, year, or category.</p>
             )}
-            
+
           </div>
         </div>
       <div className='exp' style={{display: activeElement === 'expense' ? 'block' : 'none', padding:'10vh'}}>
@@ -396,7 +435,7 @@ function DashboardScreen() {
               />
               Grid
             </label>
-  
+
           </div>
           <div>
             <button id='add' onClick={handleAddClick}>+ New</button>

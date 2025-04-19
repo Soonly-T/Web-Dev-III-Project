@@ -35,6 +35,7 @@ router.post("/login", async (req, res) => {
             throw new Error("User not found");
         }
         const correct = await encrypt.comparePassword(loginIdentifier, password);
+        console.log("correct: ", correct)
         if (correct) {
             const userData = await dbOperations.getUser(loginIdentifier);
             console.log(userData)

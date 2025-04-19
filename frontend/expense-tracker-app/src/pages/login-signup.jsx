@@ -55,7 +55,7 @@ function LoginSignupPage({ backendURL }) {
         localStorage.setItem('token', data.token); // Store the token in localStorage
         setAlertMessage('Login successful!');
         setAlertClass('success');
-        navigate('/home'); // Navigate to /home (dashboard) after successful login
+        navigate('/home'); 
       })
       .catch(error => {
         console.error('Login error:', error.message);
