@@ -227,7 +227,7 @@ router.patch('/user/patch-password', jwt.authenticateToken, async (req, res) => 
 
         if (!isCurrentPasswordCorrect) {
             
-            return res.status(401).json({ message: "Incorrect current password." });
+            return res.status(403).json({ message: "Incorrect current password." });
         }
 
         
