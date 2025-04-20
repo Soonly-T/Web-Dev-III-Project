@@ -4,10 +4,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
-  margin: 0;
-  padding: 20px;
-  box-sizing: border-box;
+  height: 100vh;
 }
 
 .login-signup-container {
@@ -17,37 +14,21 @@ body {
   width: 100%;
   max-width: 400px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-  flex-shrink: 0;
 }
 
 .login-signup-container h2 {
   text-align: center;
-  margin-bottom: 1.5rem;
-  color: #333;
+  margin-bottom: 1rem;
 }
 
-.login-signup{
-  display: block;
+input,
+button {
   width: 100%;
-  margin: 0;
-  box-sizing: border-box;
-}
-
-/* Increased padding here to make input fields slightly taller */
-.login-signup input,
-.login-signup button {
-  width: 100%;
-  padding: 12px; /* Increased padding */
+  padding: 10px;
   margin-top: 8px;
   margin-bottom: 16px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  box-sizing: border-box;
-}
-
-.login-signup button {
-    margin-left: 0;
-    margin-right: 0;
 }
 
 .success {
@@ -60,25 +41,12 @@ body {
   text-align: center;
 }
 
-button[type="submit"] {
-  background-color: #1e3a8a;
-  color: white;
-  border: none;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-button[type="submit"]:hover {
-  background-color: #172e6b;
-}
-
 .signup-link {
   display: block;
   text-align: center;
   color: #1e3a8a;
   text-decoration: none;
   margin-top: 10px;
-  font-size: 0.9rem;
 }
 
 .signup-link:hover {
@@ -86,34 +54,28 @@ button[type="submit"]:hover {
 }
 
 .cancel {
-  display: block;
   text-align: center;
   color: #f87171;
+  display: block;
   text-decoration: none;
-  margin-top: 10px;
-  font-size: 0.9rem;
-}
-
-.cancel:hover {
-  text-decoration: underline;
 }
 
 .alert {
   text-align: center;
-  padding: 10px;
-  margin-top: 15px;
-  border-radius: 4px;
-  border: 1px solid transparent;
 }
 
 .alert.success {
-  color: #155724;
-  background-color: #d4edda;
-  border-color: #c3e6cb;
+  color: green;
 }
 
 .alert.failure {
-  color: #721c24;
-  background-color: #f8d7da;
-  border-color: #f5c6cb;
+  color: red;
+}
+
+button[type="submit"] {
+  display: block;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  margin: auto;
 }

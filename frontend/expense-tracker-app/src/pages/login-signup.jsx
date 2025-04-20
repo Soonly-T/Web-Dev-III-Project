@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import '../App.css'; // Assuming App.css contains your styles
+import './login-signup.css'; // Assuming App.css contains your styles
 
 function LoginSignUpPage({ backendURL }) {
   // --- State Variables ---

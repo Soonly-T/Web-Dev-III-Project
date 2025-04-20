@@ -1,0 +1,109 @@
+/* Styles for the main container on the Home page */
+.home-container {
+    background-color: white; /* White background */
+    padding: 3rem 2rem; /* Adjust padding */
+    border-radius: 12px; /* Rounded corners */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); /* Prominent shadow */
+    text-align: center; /* Center text inside */
+    display: flex; /* Use flexbox */
+    flex-direction: column; /* Stack children vertically */
+    align-items: center; /* Center children horizontally */
+    gap: 25px; /* Increased space between major elements */
+    width: 100%; /* Take full width up to max */
+    max-width: 450px; /* Adjust max width */
+    border: 1px solid #ddd; /* Subtle border */
+    /* Ensure this container is centered on the page via body styles (in App.css or global) */
+    margin: 20px auto;
+  }
+  
+  /* Style for a visual icon at the top */
+  .home-icon {
+      color: #1e3a8a; /* Use primary color for the icon */
+      width: 60px; /* Size of the icon */
+      height: 60px;
+      margin-bottom: 1rem; /* Space below the icon */
+  }
+  
+  /* Style for the main heading */
+  .home-container h1 {
+    color: #1e3a8a; /* Use primary color for heading */
+    margin-bottom: 0.5rem; /* Space below heading */
+    font-size: 2.2rem; /* Adjust font size */
+    font-weight: 700; /* Bolder font weight */
+    line-height: 1.3; /* Improved line spacing */
+  }
+  
+  /* Style for the tagline or introductory paragraph */
+  .home-container p {
+      color: #555; /* Grey for body text */
+      font-size: 1rem;
+      margin-bottom: 1.5rem; /* Space below the paragraph */
+      line-height: 1.5;
+      max-width: 350px; /* Limit paragraph width for readability */
+  }
+  
+  /* Container for the buttons to potentially arrange them */
+  .home-buttons {
+      display: flex; /* Use flexbox for buttons */
+      flex-direction: column; /* Stack buttons by default */
+      gap: 15px; /* Space between buttons */
+      width: 100%; /* Make button container take full width */
+  }
+  
+  /* Media query to put buttons side-by-side on wider screens */
+  @media (min-width: 400px) {
+      .home-buttons {
+          flex-direction: row; /* Arrange buttons in a row */
+          justify-content: center; /* Center buttons in the row */
+          gap: 20px; /* Adjust space between buttons in row */
+      }
+       .home-container .home-link {
+          min-width: auto; /* Remove min-width when side-by-side */
+          flex-grow: 1; /* Allow buttons to grow and fill space */
+          text-align: center; /* Ensure text is centered in grown buttons */
+       }
+  }
+  
+  
+  /* Styling for the Links (Login/Signup) as prominent buttons */
+  .home-container .home-link {
+    display: inline-block; /* Allows padding and margin */
+    padding: 12px 20px; /* Padding for buttons */
+    background-color: #1e3a8a; /* Primary color background */
+    color: white; /* White text */
+    text-decoration: none; /* Remove underline */
+    border-radius: 4px; /* Rounded button corners */
+    transition: background-color 0.3s ease, transform 0.1s ease; /* Smooth hover and press effect */
+    font-size: 1rem; /* Font size for buttons */
+    font-weight: 600; /* Bolder text */
+    text-transform: uppercase; /* Uppercase text */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for buttons */
+    width: 100%; /* Buttons take full width of their container by default */
+    box-sizing: border-box; /* Include padding/border in width */
+  }
+  
+  .home-container .home-link:hover {
+    background-color: #172e6b; /* Darker shade on hover */
+    box-shadow: 0 3px 7px rgba(0, 0, 0, 0.15); /* Slightly larger shadow on hover */
+  }
+  
+  .home-container .home-link:active {
+      transform: scale(0.98); /* Slightly shrink when pressed */
+  }
+  
+  
+  /* Optional: Style for the body to center the content, assuming this is in App.css or global style */
+  /*
+  body {
+    background-color: #1e3a8a;
+    font-family: sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+  */
+  

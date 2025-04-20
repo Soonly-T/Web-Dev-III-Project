@@ -73,6 +73,51 @@ router.get('/get-user', async (req, res) => {
         return res.status(500).json({ message: "Failed to fetch user" });
     }
 });
+
+router.get('/retrieve-user-data', jwt.authenticateToken, async (req, res) => {
+    // authenticateToken middleware successfully verified the token
+    // and attached the decoded user payload to req.user
+    // The token payload includes id, username, and email (from generateAccessToken)
+
+    // Get the user's email from the token payload
+    // Assuming the email is stored in req.user.email (lowercase key from payload)
+    const userEmail = req.user.email;
+
+    console.log(`Attempting to retrieve data for user with email: ${userEmail}`); // Log for debugging
+
+    try {
+        // Fetch the user details from the database using the email
+        // Reusing the existing dbOperations.getUser function which can search by email
+        const user = await dbOperations.getUser(userEmail);
+
+        // Check if the user was found in the database using the email
+        // This check is mainly for safety; if authenticateToken passed, the user should exist.
+        if (!user) {
+            console.warn(`User data not found in DB for email: ${userEmail} after token auth.`);
+            // Although authenticated, user data not found in DB might indicate a data issue
+            // This could happen if the user was deleted after the token was issued.
+            // Returning 404 or 401 (if you want to force re-auth) is appropriate.
+            return res.status(404).json({ message: "User data not found" });
+        }
+
+        console.log(`Successfully retrieved data for user with email: ${userEmail}`); // Log success
+
+        // Return the user data (excluding sensitive info like password hash)
+        // Ensure the returned object matches what the frontend expects ({ id, username, email })
+        return res.status(200).json({
+            id: user.ID, // Assuming your dbOperations.getUser returns ID as user.ID (uppercase)
+            username: user.USERNAME, // Assuming USERNAME as user.USERNAME (uppercase)
+            email: user.EMAIL, // Assuming EMAIL as user.EMAIL (uppercase)
+            // Add any other user fields needed on the frontend
+        });
+
+    } catch (err) {
+        // Handle any errors during the database operation
+        console.error(`Error retrieving user data for email ${userEmail}:`, err);
+        return res.status(500).json({ message: "Failed to retrieve user data" });
+    }
+});
+
 router.patch('/user/patch-username', jwt.authenticateToken, async (req, res) => {
     const { newUsername } = req.body;
     const oldUsername = req.user.USERNAME; // Assuming the JWT middleware adds user info to req.user

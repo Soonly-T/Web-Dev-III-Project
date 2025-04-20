@@ -1,0 +1,132 @@
+/* Basic styling for the settings page container */
+.settings-container {
+    background-color: white; /* Consistent with login container */
+    padding: 2rem; /* Consistent padding */
+    border-radius: 8px; /* Consistent border-radius */
+    width: 100%;
+    max-width: 600px; /* Can be slightly wider than login if needed */
+    margin: 20px auto; /* Center the container and add some margin */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); /* Similar box-shadow */
+    font-family: sans-serif; /* Consistent font family */
+}
+
+.settings-container h2,
+.settings-container h3 {
+    text-align: center; /* Consistent text alignment */
+    color: #333; /* Consistent heading color */
+    margin-bottom: 1rem;
+}
+
+.settings-container h2 {
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid #eee; /* Separator */
+    padding-bottom: 1rem;
+}
+
+.settings-section {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #eee; /* Separator between sections */
+}
+
+.settings-section:last-child {
+    border-bottom: none; /* No border after the last section */
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.settings-section p {
+    margin-bottom: 1rem;
+    color: #555;
+}
+
+/* Styling for input groups (label + input) */
+.settings-section .input-group {
+    margin-bottom: 1rem;
+}
+
+.settings-section .input-group label {
+    display: block; /* Label on its own line */
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+    color: #555;
+}
+
+/* Styling for input fields - Consistent with login/signup inputs */
+.settings-section .input-group input[type="text"],
+.settings-section .input-group input[type="email"],
+.settings-section .input-group input[type="password"] {
+    width: 100%;
+    padding: 12px; /* Consistent padding */
+    border: 1px solid #ccc; /* Consistent border */
+    border-radius: 4px; /* Consistent border-radius */
+    box-sizing: border-box; /* Include padding and border in element's total width */
+    font-size: 1rem; /* Consistent font size */
+}
+
+/* Styling for buttons - Consistent with login/signup submit button */
+.settings-section button[type="submit"] {
+    display: block; /* Button on its own line */
+    width: auto; /* Auto width based on content/padding */
+    padding: 10px 20px; /* Consistent padding */
+    background-color: #1e3a8a; /* Consistent primary button color */
+    color: white;
+    border: none;
+    border-radius: 4px; /* Consistent border-radius */
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease, opacity 0.3s ease;
+    margin-top: 1rem; /* Space above the button */
+}
+
+.settings-section button[type="submit"]:hover:not(:disabled) {
+    background-color: #172e6b; /* Consistent darker on hover */
+}
+
+.settings-section button[type="submit"]:disabled {
+    background-color: #cccccc; /* Grey out when disabled */
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+
+/* Styling for messages - Consistent with login/signup alerts */
+.alert {
+    padding: 10px;
+    margin-bottom: 1rem;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.alert.success {
+    color: #155724; /* Consistent success color */
+    background-color: #d4edda; /* Consistent success background */
+    border: 1px solid #c3e6cb; /* Consistent success border */
+}
+
+.alert.failure {
+    color: #721c24; /* Consistent failure color */
+    background-color: #f8d7da; /* Consistent failure background */
+    border: 1px solid #f5c6cb; /* Consistent failure border */
+}
+
+.error { /* Specific style for password mismatch, consistent with App.css/login */
+    color: red;
+    text-align: center;
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.loading-indicator {
+    text-align: center;
+    color: #555;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.error-message { /* For prominent error on initial load */
+    color: red;
+    text-align: center;
+    margin-top: 20vh; /* Center roughly */
+    font-size: 1.2rem;
+}

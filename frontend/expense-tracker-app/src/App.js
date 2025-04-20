@@ -4,6 +4,7 @@ import LoginSignupPage from './pages/login-signup';
 import { Link, Route, Routes } from 'react-router-dom'; // Import necessary components, but NOT Router
 import HomePage from './pages/home';
 import DashboardScreen from './pages/dashboardScreen';
+import UserSettingsPage from './pages/UserSettingsPage';
 
 const BACKEND_URL = 'http://localhost:3060';
 function App() {
@@ -15,6 +16,7 @@ function App() {
       <Route path="/" element={<HomePage  />} />
         <Route path="/login-signup" element={<LoginSignupPage backendURL={BACKEND_URL} />} />
         <Route path="/home" element={<DashboardScreen backendURL={BACKEND_URL} />} />
+        <Route path="/modify-user" element={<UserSettingsPage backendURL={BACKEND_URL} />}></Route>
         {/* You can add more routes here */}
       </Routes>
     </div>
