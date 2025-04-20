@@ -48,14 +48,14 @@ router.post('/add-expense', authenticateToken, async (req, res) => {
 
 router.put('/modify-expense', authenticateToken, async (req, res) => {
     const userId = req.user.id; 
-    const { id, amount, category, notes } = req.body;
+    const { id, amount, category, date, notes } = req.body;
 
     try {
         const expense = await dbOperations.getExpenseByIdAndUserId(id, userId); 
         if (!expense) {
             return res.status(403).json({ message: "Unauthorized to modify this expense" });
         }
-        await dbOperations.modifyExpense(id, userId, amount, category, notes);
+        await dbOperations.modifyExpense(id, userId, amount, category, date, notes);
         res.status(200).json({ message: "Expense modified successfully" });
     } catch (err) {
         console.log(err);
