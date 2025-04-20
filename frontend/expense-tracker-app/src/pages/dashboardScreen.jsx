@@ -38,7 +38,7 @@ function DashboardScreen() {
       });
 
       // Handle expired token
-      if (response.status === 401) {
+      if (response.status === 403) {
         localStorage.removeItem('token'); // Remove invalid token
         navigate('/login-signup'); // Redirect to login
         return;
@@ -125,7 +125,7 @@ function DashboardScreen() {
       });
 
       // Handle expired token during delete
-      if (response.status === 401) {
+      if (response.status === 403) {
         localStorage.removeItem('token');
         navigate('/login-signup');
         return;
@@ -183,7 +183,7 @@ function DashboardScreen() {
       });
 
       // Handle expired token during form submission
-      if (response.status === 401) {
+      if (response.status === 403) {
         localStorage.removeItem('token');
         navigate('/login-signup');
         return;
