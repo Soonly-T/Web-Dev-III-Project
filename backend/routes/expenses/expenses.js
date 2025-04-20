@@ -4,7 +4,7 @@ const { authenticateToken } = require('../../middleware/jwt');
 const router = express.Router();
 
 router.get('/get-expenses', authenticateToken, async (req, res) => {
-    const userId = req.user.id; // Get user ID from the JWT
+    const userId = req.user.id; 
     try {
         const expenses = await dbOperations.getExpenses(userId);
         console.log(expenses);
@@ -20,7 +20,7 @@ router.delete('/remove-expense/:id', authenticateToken, async (req, res) => {
     const userId = req.user.id;
 
     try {
-        const expense = await dbOperations.getExpenseByIdAndUserId(id, userId); // Implement this function in dbOperations
+        const expense = await dbOperations.getExpenseByIdAndUserId(id, userId); 
         if (!expense) {
             return res.status(403).json({ message: "Unauthorized to remove this expense" });
         }
@@ -33,7 +33,7 @@ router.delete('/remove-expense/:id', authenticateToken, async (req, res) => {
 });
 
 router.post('/add-expense', authenticateToken, async (req, res) => {
-    const userId = req.user.id; // Get user ID from the JWT
+    const userId = req.user.id; 
     const { amount, category, date, notes } = req.body;
     console.log(userId);
 
@@ -47,11 +47,11 @@ router.post('/add-expense', authenticateToken, async (req, res) => {
 });
 
 router.put('/modify-expense', authenticateToken, async (req, res) => {
-    const userId = req.user.id; // Get user ID from the JWT
+    const userId = req.user.id; 
     const { id, amount, category, notes } = req.body;
 
     try {
-        const expense = await dbOperations.getExpenseByIdAndUserId(id, userId); // Verify ownership before modifying
+        const expense = await dbOperations.getExpenseByIdAndUserId(id, userId); 
         if (!expense) {
             return res.status(403).json({ message: "Unauthorized to modify this expense" });
         }

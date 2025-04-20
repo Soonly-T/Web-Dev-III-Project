@@ -1,49 +1,49 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import './login-signup.css'; // Assuming App.css contains your styles
+import './login-signup.css'; 
 
 function LoginSignUpPage({ backendURL }) {
-  // --- State Variables ---
-  const [isLogin, setIsLogin] = useState(true); // Toggle between login and signup views
+  
+  const [isLogin, setIsLogin] = useState(true); 
 
-  // Login form state
+  
   const [loginUsername, setLoginUsername] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
 
-  // Signup form state
+  
   const [signupUsername, setSignupUsername] = useState('');
   const [signupEmail, setSignupEmail] = useState('');
   const [signupPassword, setSignupPassword] = useState('');
   const [signupConfirmPassword, setSignupConfirmPassword] = useState('');
 
-  // Validation and alert states
-  const [passwordMatchError, setPasswordMatchError] = useState(''); // Specific error for password mismatch
-  const [alertMessage, setAlertMessage] = useState(''); // General alert message (success or failure)
-  const [alertClass, setAlertClass] = useState(''); // CSS class for alert message ('success' or 'failure')
+  
+  const [passwordMatchError, setPasswordMatchError] = useState(''); 
+  const [alertMessage, setAlertMessage] = useState(''); 
+  const [alertClass, setAlertClass] = useState(''); 
 
-  // Navigation hook
+  
   const navigate = useNavigate();
-  // Hook to read URL search parameters (like ?mode=signup)
+  
   const [searchParams] = useSearchParams();
 
-  // --- Constants ---
-  const MIN_PASSWORD_LENGTH = 8; // Define minimum password length
+  
+  const MIN_PASSWORD_LENGTH = 8; 
 
-  // --- Effect Hook to Set Mode from URL ---
-  // Checks the URL search params on component mount or search param change
-  // to determine if the page should start in login or signup mode.
+  
+  
+  
   useEffect(() => {
     const mode = searchParams.get('mode');
-    // If mode is 'signup', set to signup; otherwise, default to login.
+    
     setIsLogin(mode !== 'signup');
-  }, [searchParams]); // Effect depends on searchParams
+  }, [searchParams]); 
 
-  // --- Toggle Function ---
-  // Switches between login and signup forms.
-  // Clears validation errors and alerts when switching.
+  
+  
+  
   const toggleSignUp = () => {
-    setIsLogin(!isLogin); // Flip the boolean state
-    // Clear fields, errors, and alerts when switching forms
+    setIsLogin(!isLogin); 
+    
     setLoginUsername('');
     setLoginPassword('');
     setSignupUsername('');
@@ -55,127 +55,127 @@ function LoginSignUpPage({ backendURL }) {
     setAlertClass('');
   };
 
-  // --- Login Submission Handler ---
+  
   const handleLoginSubmit = async (e) => {
-    e.preventDefault(); // Prevent default form refresh
-    setAlertMessage(''); // Clear previous alert
-    setAlertClass(''); // Clear previous alert class
-    setPasswordMatchError(''); // Clear password mismatch error
+    e.preventDefault(); 
+    setAlertMessage(''); 
+    setAlertClass(''); 
+    setPasswordMatchError(''); 
 
-    // --- Validation: Password Length ---
+    
     if (loginPassword.length < MIN_PASSWORD_LENGTH) {
         setAlertMessage(`Password must be at least ${MIN_PASSWORD_LENGTH} characters long.`);
-        setAlertClass('failure'); // Assuming 'failure' class styles error alerts
-        return; // Stop the submission process
+        setAlertClass('failure'); 
+        return; 
     }
-    // -------------------------------
+    
 
     try {
-      // Send POST request to the login endpoint
+      
       const response = await fetch(`${backendURL}/login`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' }, // Indicate JSON body
+        headers: { 'Content-Type': 'application/json' }, 
         body: JSON.stringify({
-          loginIdentifier: loginUsername, // Use username or email as identifier
+          loginIdentifier: loginUsername, 
           password: loginPassword,
         }),
       });
 
-      // Check if the response status is not OK (indicating an error)
+      
       if (!response.ok) {
-        const errorData = await response.json(); // Attempt to read error message from body
-        throw new Error(errorData.message || 'Login failed'); // Throw an error with message
+        const errorData = await response.json(); 
+        throw new Error(errorData.message || 'Login failed'); 
       }
 
-      // If login is successful, parse the JSON response
+      
       const data = await response.json();
-      localStorage.setItem('token', data.token); // Store the received JWT token in local storage
+      localStorage.setItem('token', data.token); 
 
-      // Display success message and navigate
+      
       setAlertMessage('Login successful!');
       setAlertClass('success');
-      navigate('/home'); // Redirect to the dashboard or home page
+      navigate('/home'); 
 
     } catch (error) {
-      // Catch any errors during fetch or processing
-      console.error("Login Error:", error); // Log error to console
-      setAlertMessage(`Login failed: ${error.message}`); // Display error message to user
-      setAlertClass('failure'); // Set alert class to failure
+      
+      console.error("Login Error:", error); 
+      setAlertMessage(`Login failed: ${error.message}`); 
+      setAlertClass('failure'); 
     }
   };
 
-  // --- Signup Submission Handler ---
+  
   const handleSignUpSubmit = async (e) => {
-    e.preventDefault(); // Prevent default form refresh
-    setPasswordMatchError(''); // Clear previous password mismatch error
-    setAlertMessage(''); // Clear previous alert
-    setAlertClass(''); // Clear previous alert class
+    e.preventDefault(); 
+    setPasswordMatchError(''); 
+    setAlertMessage(''); 
+    setAlertClass(''); 
 
-    // --- Validation: Password Length ---
+    
     if (signupPassword.length < MIN_PASSWORD_LENGTH) {
         setAlertMessage(`Password must be at least ${MIN_PASSWORD_LENGTH} characters long.`);
         setAlertClass('failure');
-        return; // Stop the submission process
+        return; 
     }
-    // -------------------------------
+    
 
-    // --- Validation: Password Match (Already present) ---
+    
     if (signupPassword !== signupConfirmPassword) {
-      setPasswordMatchError("Passwords do not match."); // Set specific mismatch error state
-      // No need to set general alert here, passwordMatchError div handles display
-      return; // Stop the submission process
+      setPasswordMatchError("Passwords do not match."); 
+      
+      return; 
     }
-    // -------------------------------------------------
+    
 
     try {
-      // Send POST request to the signup endpoint
+      
       const response = await fetch(`${backendURL}/signup`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' }, // Indicate JSON body
+        headers: { 'Content-Type': 'application/json' }, 
         body: JSON.stringify({
           username: signupUsername,
           email: signupEmail,
-          password: signupPassword, // Send the main password
+          password: signupPassword, 
         }),
       });
 
-      // Check if the response status is not OK
+      
       if (!response.ok) {
-        const errorData = await response.json(); // Attempt to read error message
-        throw new Error(errorData.message || 'Signup failed'); // Throw an error with message
+        const errorData = await response.json(); 
+        throw new Error(errorData.message || 'Signup failed'); 
       }
 
-      // If signup is successful, parse the response
-      const data = await response.json(); // Backend might return user data or success message
+      
+      const data = await response.json(); 
 
-      // Display success message and redirect to login page
-      setAlertMessage('Signup successful! Please log in.'); // Inform user to log in
+      
+      setAlertMessage('Signup successful! Please log in.'); 
       setAlertClass('success');
-      // Use replace: true to prevent going back to signup page with browser back button
+      
       navigate('/login-signup', { replace: true });
 
     } catch (error) {
-      // Catch any errors during fetch or processing
-      console.error("Signup Error:", error); // Log error to console
-      setAlertMessage(`Signup failed: ${error.message}`); // Display error message to user
-      setAlertClass('failure'); // Set alert class to failure
+      
+      console.error("Signup Error:", error); 
+      setAlertMessage(`Signup failed: ${error.message}`); 
+      setAlertClass('failure'); 
     }
   };
 
-  // --- Render Component ---
+  
   return (
     <div className="login-signup-container">
-      {/* Dynamic heading based on current mode */}
+      {}
       <h2>{isLogin ? 'Login' : 'Sign Up'}</h2>
 
-      {/* Conditionally render Login form or Signup form */}
+      {}
       {isLogin ? (
-        // --- Login Form ---
+        
         <form className="login-signup" onSubmit={handleLoginSubmit}>
           <label htmlFor="loginUsername">Username or Email</label>
           <input
             type="text"
-            id="loginUsername" // Link label to input
+            id="loginUsername" 
             value={loginUsername}
             onChange={(e) => setLoginUsername(e.target.value)}
             required
@@ -184,17 +184,17 @@ function LoginSignUpPage({ backendURL }) {
           <label htmlFor="loginPassword">Password</label>
           <input
             type="password"
-            id="loginPassword" // Link label to input
+            id="loginPassword" 
             value={loginPassword}
             onChange={(e) => setLoginPassword(e.target.value)}
             required
-            minLength={MIN_PASSWORD_LENGTH} // Add minLength attribute for browser validation hint
+            minLength={MIN_PASSWORD_LENGTH} 
           />
 
           <button type="submit">Login</button>
 
-          {/* Link to switch to Signup form */}
-          {/* Using role="button" and aria-label for accessibility on non-link behavior */}
+          {}
+          {}
           <a
             href="#"
             className="signup-link"
@@ -207,12 +207,12 @@ function LoginSignUpPage({ backendURL }) {
         </form>
 
       ) : (
-        // --- Sign Up Form ---
+        
         <form className="login-signup" onSubmit={handleSignUpSubmit}>
           <label htmlFor="signupUsername">Username</label>
           <input
             type="text"
-            id="signupUsername" // Link label to input
+            id="signupUsername" 
             value={signupUsername}
             onChange={(e) => setSignupUsername(e.target.value)}
             required
@@ -221,7 +221,7 @@ function LoginSignUpPage({ backendURL }) {
           <label htmlFor="signupEmail">Email</label>
           <input
             type="email"
-            id="signupEmail" // Link label to input
+            id="signupEmail" 
             value={signupEmail}
             onChange={(e) => setSignupEmail(e.target.value)}
             required
@@ -230,30 +230,30 @@ function LoginSignUpPage({ backendURL }) {
           <label htmlFor="signupPassword">Password</label>
           <input
             type="password"
-            id="signupPassword" // Link label to input
+            id="signupPassword" 
             value={signupPassword}
             onChange={(e) => setSignupPassword(e.target.value)}
             required
-            minLength={MIN_PASSWORD_LENGTH} // Add minLength attribute for browser validation hint
+            minLength={MIN_PASSWORD_LENGTH} 
           />
 
           <label htmlFor="signupConfirmPassword">Confirm Password</label>
           <input
             type="password"
-            id="signupConfirmPassword" // Link label to input
+            id="signupConfirmPassword" 
             value={signupConfirmPassword}
             onChange={(e) => setSignupConfirmPassword(e.target.value)}
             required
-            minLength={MIN_PASSWORD_LENGTH} // Add minLength attribute for browser validation hint
+            minLength={MIN_PASSWORD_LENGTH} 
           />
 
-          {/* Display password mismatch error if state is set */}
+          {}
           {passwordMatchError && <div className="error">{passwordMatchError}</div>}
 
           <button type="submit">Sign Up</button>
 
-          {/* Link to switch back to Login form */}
-          {/* Using role="button" and aria-label for accessibility on non-link behavior */}
+          {}
+          {}
            <a
             href="#"
             className="cancel"
@@ -266,7 +266,7 @@ function LoginSignUpPage({ backendURL }) {
         </form>
       )}
 
-      {/* Display general alert message if state is set */}
+      {}
       {alertMessage && <div className={`alert ${alertClass}`}>{alertMessage}</div>}
     </div>
   );
